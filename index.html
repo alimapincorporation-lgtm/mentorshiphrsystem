@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor HRMS v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:      #0D1F4E;
+  --navy-mid:  #1B3272;
+  --navy-lt:   #243E8A;
+  --amber:     #F59E0B;
+  --amber-dk:  #D97706;
+  --amber-lt:  #FEF3C7;
+  --surface:   #F3F6FB;
+  --border:    #E3E8F2;
+  --text:      #0D1F4E;
+  --sub:       #64748B;
+  --success:   #059669;
+  --danger:    #DC2626;
+  --warning:   #D97706;
+  --sidebar-w: 252px;
+  --topbar-h:  62px;
+  --r:         11px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--text);height:100dvh;display:flex;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;height:100dvh;position:relative;z-index:200;transition:transform .28s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.sb-decor{position:absolute;pointer-events:none;}
+.sb-decor-1{bottom:-90px;right:-90px;width:240px;height:240px;background:conic-gradient(from 45deg,var(--amber),transparent,var(--navy-lt));border-radius:50%;opacity:.07;}
+.sb-decor-2{top:60px;right:-60px;width:160px;height:160px;border:1.5px solid rgba(255,255,255,.04);border-radius:50%;}
+
+.sb-logo{padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:1;}
+.sb-brand{display:flex;align-items:center;gap:11px;}
+.sb-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--amber),var(--amber-dk));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(245,158,11,.35);}
+.sb-icon svg{color:white;}
+.sb-name{color:white;font-weight:800;font-size:16.5px;letter-spacing:-.4px;line-height:1.2;}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.38);letter-spacing:1.8px;text-transform:uppercase;font-weight:600;margin-top:1px;}
+.sb-close{display:none;background:rgba(255,255,255,.07);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;align-items:center;justify-content:center;color:rgba(255,255,255,.55);flex-shrink:0;transition:background .15s;}
+.sb-close:hover{background:rgba(255,255,255,.14);}
+
+.sb-nav{flex:1;padding:10px 0 8px;overflow-y:auto;position:relative;z-index:1;}
+.sb-nav::-webkit-scrollbar{width:3px;}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:3px;}
+.nav-label{font-size:9.5px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 18px 6px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 13px;margin:2px 9px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.48);font-size:13.5px;font-weight:500;transition:all .16s;user-select:none;position:relative;}
+.nav-item svg{flex-shrink:0;width:17px;height:17px;stroke-width:2;}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.82);}
+.nav-item.active{background:linear-gradient(135deg,var(--amber),var(--amber-dk));color:white;font-weight:700;box-shadow:0 4px 16px rgba(245,158,11,.32);}
+.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:10px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
+.nav-item.active .nav-badge{background:rgba(255,255,255,.28);}
+
+.sb-footer{padding:12px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0;position:relative;z-index:1;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,.06);transition:background .16s;}
+.user-chip:hover{background:rgba(255,255,255,.1);}
+.u-av{width:34px;height:34px;background:linear-gradient(135deg,var(--amber),var(--amber-dk));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;}
+.u-name{color:white;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-role{color:rgba(255,255,255,.36);font-size:11px;}
+.u-arrow{color:rgba(255,255,255,.22);margin-left:auto;flex-shrink:0;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+
+/* ── TOPBAR ── */
+.topbar{height:var(--topbar-h);background:white;border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.hamburger{display:none;background:none;border:1.5px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;align-items:center;justify-content:center;color:var(--sub);flex-shrink:0;transition:all .16s;}
+.hamburger:hover{background:var(--surface);border-color:var(--navy-lt);color:var(--navy);}
+.tb-info{flex:1;min-width:0;}
+.tb-info h1{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tb-info p{font-size:12px;color:var(--sub);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.date-pill{font-size:12px;color:var(--sub);background:var(--surface);padding:6px 12px;border-radius:20px;border:1px solid var(--border);white-space:nowrap;}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .16s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.btn-primary{background:linear-gradient(135deg,var(--amber),var(--amber-dk));color:white;box-shadow:0 2px 8px rgba(245,158,11,.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(245,158,11,.38);}
+.btn-outline{background:white;color:var(--navy);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--navy-lt);background:var(--surface);}
+.btn-ghost{background:transparent;color:var(--sub);border:1.5px solid var(--border);}
+.btn-ghost:hover{background:var(--surface);color:var(--text);}
+.btn-sm{padding:5px 11px;font-size:11.5px;border-radius:7px;}
+.btn-success{background:#D1FAE5;color:#065F46;border:none;}
+.btn-success:hover{background:#A7F3D0;}
+.btn-danger{background:#FEE2E2;color:#991B1B;border:none;}
+.btn-danger:hover{background:#FECACA;}
+.btn-navy{background:var(--navy);color:white;}
+.btn-navy:hover{background:var(--navy-mid);}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:20px 22px;}
+.content::-webkit-scrollbar{width:5px;}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.section{display:none;animation:fadeUp .2s ease;}
+.section.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px;}
+.stat-card{background:white;border-radius:var(--r);padding:17px;border:1px solid var(--border);position:relative;transition:transform .2s,box-shadow .2s;}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(13,31,78,.1);}
+.stat-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:11px;}
+.stat-ico{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.stat-ico svg{width:19px;height:19px;}
+.ico-blue{background:#EFF6FF;color:#2563EB;}
+.ico-green{background:#ECFDF5;color:#059669;}
+.ico-amber{background:#FFFBEB;color:#D97706;}
+.ico-red{background:#FEF2F2;color:#DC2626;}
+.ico-purple{background:#F5F3FF;color:#7C3AED;}
+.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.chip-up{background:#ECFDF5;color:#065F46;}
+.chip-down{background:#FEF2F2;color:#991B1B;}
+.chip-neutral{background:#F1F5F9;color:#475569;}
+.stat-val{font-size:31px;font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:12px;color:var(--sub);font-weight:500;}
+
+/* ── CARD ── */
+.card{background:white;border-radius:var(--r);border:1px solid var(--border);overflow:hidden;}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);}
+.card-title{font-size:14px;font-weight:700;}
+.card-sub{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.card-body{padding:16px 18px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:13px;}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+.tbl-wrap::-webkit-scrollbar{height:4px;}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:#F8FAFF;}
+th{text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--sub);padding:11px 15px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 15px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#FAFBFF;}
+.ec{display:flex;align-items:center;gap:10px;}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;}
+.en{font-weight:600;font-size:13.5px;}
+.ee{font-size:11.5px;color:var(--sub);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+.badge::before{content:'●';font-size:7px;}
+.b-present{background:#D1FAE5;color:#065F46;}
+.b-absent{background:#FEE2E2;color:#991B1B;}
+.b-late{background:#FEF3C7;color:#92400E;}
+.b-leave{background:#EDE9FE;color:#5B21B6;}
+.b-active{background:#DBEAFE;color:#1E40AF;}
+.b-pending{background:#FEF9C3;color:#713F12;}
+.b-approved{background:#D1FAE5;color:#065F46;}
+.b-rejected{background:#FEE2E2;color:#991B1B;}
+.b-interview{background:#EDE9FE;color:#5B21B6;}
+.b-shortlisted{background:#DBEAFE;color:#1E40AF;}
+.b-hired{background:#D1FAE5;color:#065F46;}
+.b-open{background:#FEF3C7;color:#92400E;}
+.b-warning{background:#FEF3C7;color:#92400E;}
+.b-dismissed{background:#FEE2E2;color:#991B1B;}
+.b-resolved{background:#D1FAE5;color:#065F46;}
+.b-excellent{background:#D1FAE5;color:#065F46;}
+.b-good{background:#DBEAFE;color:#1E40AF;}
+.b-average{background:#FEF9C3;color:#713F12;}
+.b-poor{background:#FEE2E2;color:#991B1B;}
+.b-morning{background:#EFF6FF;color:#2563EB;}
+.b-afternoon{background:#FDF4FF;color:#7E22CE;}
+.b-night{background:#1E293B;color:#94A3B8;}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;align-items:center;gap:8px;margin-bottom:13px;flex-wrap:wrap;}
+.search-box{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;background:white;border:1.5px solid var(--border);border-radius:9px;padding:8px 12px;transition:border-color .16s;}
+.search-box:focus-within{border-color:var(--navy-lt);box-shadow:0 0 0 3px rgba(36,62,138,.07);}
+.search-box svg{color:var(--sub);flex-shrink:0;width:15px;height:15px;}
+.search-box input{border:none;outline:none;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);width:100%;background:transparent;}
+.fi{border:1.5px solid var(--border);border-radius:9px;padding:8px 11px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:white;outline:none;cursor:pointer;transition:border-color .16s;}
+.fi:focus{border-color:var(--navy-lt);}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:8px;}
+.sec-title{font-size:15px;font-weight:700;}
+
+/* ── BAR CHART ── */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:88px;padding-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+.bar{width:100%;max-width:28px;background:var(--navy-mid);border-radius:5px 5px 0 0;transition:height .5s ease;}
+.bar:hover{background:var(--amber);cursor:pointer;}
+.bar-lbl{font-size:10.5px;color:var(--sub);font-weight:600;}
+.chart-legend{display:flex;gap:14px;margin-top:11px;}
+.legend-dot{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);}
+.legend-dot span{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+/* ── LEAVE ITEMS ── */
+.li{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
+.li:last-child{border-bottom:none;}
+.li-info{flex:1;min-width:0;}
+.li-name{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.li-meta{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.li-act{display:flex;gap:5px;flex-shrink:0;}
+
+/* ── CLOCK PANEL ── */
+.clock-panel{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-lt) 100%);border-radius:var(--r);padding:22px;color:white;text-align:center;margin-bottom:13px;position:relative;overflow:hidden;}
+.clock-panel::before{content:'';position:absolute;bottom:-40px;right:-40px;width:140px;height:140px;background:var(--amber);border-radius:50%;opacity:.07;}
+.clock-panel::after{content:'';position:absolute;top:-28px;left:-28px;width:100px;height:100px;border:2px solid rgba(255,255,255,.06);border-radius:50%;}
+.clk-label{font-size:12px;opacity:.5;font-weight:500;letter-spacing:.4px;}
+.clk-time{font-size:50px;font-weight:800;letter-spacing:-2px;margin:7px 0 3px;line-height:1;}
+.clk-tz{font-size:11.5px;opacity:.38;font-weight:500;}
+.clk-acts{display:flex;gap:10px;justify-content:center;margin-top:17px;flex-wrap:wrap;}
+.clk-btn{padding:10px 26px;border-radius:30px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .16s;display:flex;align-items:center;gap:7px;}
+.clk-btn svg{width:15px;height:15px;}
+.clk-in{background:linear-gradient(135deg,var(--amber),var(--amber-dk));color:white;box-shadow:0 4px 14px rgba(245,158,11,.38);}
+.clk-in:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,158,11,.48);}
+.clk-out{background:rgba(255,255,255,.1);color:rgba(255,255,255,.82);border:1.5px solid rgba(255,255,255,.18);}
+.clk-out:hover{background:rgba(255,255,255,.17);}
+
+/* ── PAYROLL BANNER ── */
+.pay-banner{background:linear-gradient(135deg,var(--amber),var(--amber-dk));border-radius:var(--r);padding:20px 22px;color:white;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pay-lbl{font-size:12px;opacity:.72;font-weight:500;}
+.pay-amt{font-size:28px;font-weight:800;letter-spacing:-1px;margin-top:4px;}
+
+/* ── GRADIENT CARDS ── */
+.card-navy{background:linear-gradient(135deg,var(--navy),var(--navy-lt));color:white;border:none;}
+.card-amber{background:linear-gradient(135deg,var(--amber),var(--amber-dk));color:white;border:none;}
+.prog{height:5px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;margin-top:8px;}
+.prog-fill{height:100%;background:white;border-radius:3px;opacity:.7;}
+.card-amber .prog-fill{background:white;opacity:.8;}
+
+/* ── FORM ── */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.fg{margin-bottom:12px;}
+.fl{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;display:block;}
+.fc{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);outline:none;transition:all .16s;background:white;}
+.fc:focus{border-color:var(--navy-lt);box-shadow:0 0 0 3px rgba(36,62,138,.07);}
+textarea.fc{resize:vertical;}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(13,31,78,.58);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center;padding:14px;}
+.overlay.open{display:flex;}
+.modal{background:white;border-radius:15px;width:500px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(13,31,78,.24);animation:modalIn .2s cubic-bezier(.4,0,.2,1);}
+.modal-lg{width:680px;}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.m-hd{padding:18px 22px 15px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1;}
+.m-title{font-size:16px;font-weight:800;}
+.m-close{width:30px;height:30px;border-radius:8px;background:var(--surface);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub);transition:all .15s;}
+.m-close:hover{background:#FEE2E2;color:var(--danger);border-color:#FECACA;}
+.m-body{padding:18px 22px;}
+.m-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:white;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:white;padding:12px 17px;border-radius:10px;font-size:13.5px;font-weight:500;box-shadow:0 8px 32px rgba(13,31,78,.22);z-index:9999;display:none;align-items:center;gap:8px;max-width:calc(100vw - 44px);animation:toastIn .22s cubic-bezier(.4,0,.2,1);}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.toast.show{display:flex;}
+.toast.success{background:#065F46;}
+.toast.error{background:#991B1B;}
+.toast svg{flex-shrink:0;width:15px;height:15px;}
+
+/* ── SIDEBAR BACKDROP ── */
+.backdrop{display:none;position:fixed;inset:0;background:rgba(13,31,78,.55);z-index:190;backdrop-filter:blur(2px);}
+.backdrop.open{display:block;}
+
+/* ── PERFORMANCE SCORE RING ── */
+.score-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-ring-val{position:absolute;font-size:13px;font-weight:800;color:var(--navy);}
+
+/* ── SHIFT CALENDAR ── */
+.shift-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px;}
+.shift-day-hd{text-align:center;font-size:10px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;padding:4px 0;}
+.shift-cell{border-radius:7px;padding:6px 4px;min-height:48px;border:1px solid var(--border);background:white;font-size:10px;cursor:pointer;transition:all .15s;position:relative;}
+.shift-cell:hover{border-color:var(--amber);background:var(--amber-lt);}
+.shift-cell.has-shift{background:#EFF6FF;border-color:#BFDBFE;}
+.shift-pill{display:block;background:var(--navy);color:white;border-radius:4px;padding:2px 5px;font-size:9.5px;font-weight:700;margin-top:3px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shift-pill.morning{background:#2563EB;}
+.shift-pill.afternoon{background:#7C3AED;}
+.shift-pill.night{background:#1E293B;}
+
+/* ── DOCUMENT LIST ── */
+.doc-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.doc-item:last-child{border-bottom:none;}
+.doc-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-ico-pdf{background:#FEF2F2;color:#DC2626;}
+.doc-ico-doc{background:#EFF6FF;color:#2563EB;}
+.doc-ico-img{background:#ECFDF5;color:#059669;}
+.doc-ico-other{background:#F5F3FF;color:#7C3AED;}
+.doc-info{flex:1;min-width:0;}
+.doc-name{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.doc-meta{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.doc-act{display:flex;gap:5px;flex-shrink:0;}
+
+/* ── KPI ROW ── */
+.kpi-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.kpi-row:last-child{border-bottom:none;}
+.kpi-label{flex:1;font-size:13px;font-weight:500;}
+.kpi-bar-wrap{width:120px;height:6px;background:var(--surface);border-radius:3px;overflow:hidden;flex-shrink:0;}
+.kpi-bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.kpi-val{font-size:12px;font-weight:700;min-width:32px;text-align:right;}
+
+/* ── PAYSLIP DEDUCTIONS TABLE ── */
+.ded-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.ded-row:last-child{border-bottom:none;}
+.ded-row.total{font-weight:800;font-size:15px;padding-top:12px;}
+.ded-lbl{color:var(--sub);}
+.ded-amt{font-weight:700;}
+.ded-red{color:var(--danger);}
+.ded-green{color:var(--success);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr);}.g3{grid-template-columns:1fr 1fr;}}
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;left:0;height:100dvh;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sb-close{display:flex;}
+  .hamburger{display:flex;}
+  .main{width:100%;}
+  .content{padding:14px;}
+  .topbar{padding:0 14px;}
+  .g2{grid-template-columns:1fr;}
+  .g3{grid-template-columns:1fr;}
+  .date-pill{display:none;}
+  .shift-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-val{font-size:26px;}
+  .clk-time{font-size:40px;}
+  .pay-amt{font-size:22px;}
+  .frow{grid-template-columns:1fr;}
+  .tb-info h1{font-size:14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+<!-- ════════════ SIDEBAR ════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-decor sb-decor-1"></div>
+  <div class="sb-decor sb-decor-2"></div>
+
+  <div class="sb-logo">
+    <div class="sb-brand">
+      <div class="sb-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
+      <div>
+        <div class="sb-name">Mentor</div>
+        <div class="sb-sub">Human Resource Services</div>
+      </div>
+    </div>
+    <button class="sb-close" onclick="closeSidebar()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="nav('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="nav('employees',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Employees
+    </div>
+    <div class="nav-item" onclick="nav('attendance',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Attendance
+    </div>
+    <div class="nav-item" onclick="nav('leave',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Leave
+      <span class="nav-badge" id="leave-nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="nav('payroll',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Payroll
+    </div>
+
+    <div class="nav-label">People</div>
+    <div class="nav-item" onclick="nav('performance',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Performance
+    </div>
+    <div class="nav-item" onclick="nav('recruitment',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Recruitment
+      <span class="nav-badge" id="recruit-nav-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="nav('disciplinary',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Disciplinary
+      <span class="nav-badge" id="disc-nav-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="nav('documents',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Documents
+    </div>
+    <div class="nav-item" onclick="nav('shifts',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></svg>
+      Shift Roster
+    </div>
+
+    <div class="nav-label">System</div>
+    <div class="nav-item" onclick="nav('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="user-chip">
+      <div class="u-av">HR</div>
+      <div style="flex:1;min-width:0">
+        <div class="u-name">Admin — Mentor</div>
+        <div class="u-role">HR Administrator</div>
+      </div>
+      <div class="u-arrow">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ════════════ MAIN ════════════ -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="openSidebar()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="tb-info">
+      <h1 id="pg-title">Dashboard Overview</h1>
+      <p id="pg-sub">Welcome back — here's what's happening today</p>
+    </div>
+    <div class="tb-right">
+      <div class="date-pill" id="today-pill"></div>
+      <button class="btn btn-primary" onclick="topAction()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span id="top-lbl">Add Employee</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ════ DASHBOARD ════ -->
+    <section class="section active" id="sec-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="chip chip-up">+2 this month</span></div>
+          <div class="stat-val" id="stat-total">6</div><div class="stat-lbl">Total Employees</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-ico ico-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="chip chip-up" id="stat-present-pct">75%</span></div>
+          <div class="stat-val" id="stat-present">4</div><div class="stat-lbl">Present Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-ico ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="chip chip-down" id="stat-pending-chip">3 pending</span></div>
+          <div class="stat-val" id="stat-leave">1</div><div class="stat-lbl">On Leave</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><div class="stat-ico ico-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="chip chip-down">No notice</span></div>
+          <div class="stat-val" id="stat-absent">1</div><div class="stat-lbl">Absent Today</div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Weekly Attendance</div><div class="card-sub">April 2026 — this week</div></div>
+            <span style="font-size:11.5px;color:var(--sub);background:var(--surface);padding:4px 10px;border-radius:20px;border:1px solid var(--border);font-weight:600" id="dash-emp-count">6 staff</span>
+          </div>
+          <div class="card-body">
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar" style="height:85%"></div><div class="bar-lbl">Mon</div></div>
+              <div class="bar-col"><div class="bar" style="height:79%"></div><div class="bar-lbl">Tue</div></div>
+              <div class="bar-col"><div class="bar" style="height:91%"></div><div class="bar-lbl">Wed</div></div>
+              <div class="bar-col"><div class="bar" style="height:71%"></div><div class="bar-lbl">Thu</div></div>
+              <div class="bar-col"><div class="bar" style="height:75%;background:var(--amber)"></div><div class="bar-lbl">Fri</div></div>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-dot"><span style="background:var(--navy-mid)"></span>Past</span>
+              <span class="legend-dot"><span style="background:var(--amber)"></span>Today</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Pending Leave Requests</div><div class="card-sub">Requires your approval</div></div>
+            <button class="btn btn-outline btn-sm" onclick="nav('leave',document.querySelectorAll('.nav-item')[3])">View All</button>
+          </div>
+          <div class="card-body" id="dash-leaves" style="padding-top:4px;padding-bottom:4px"></div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd"><div><div class="card-title">Open Job Positions</div><div class="card-sub">Active recruitment pipeline</div></div><button class="btn btn-outline btn-sm" onclick="nav('recruitment',document.querySelectorAll('.nav-item')[7])">View All</button></div>
+          <div class="card-body" id="dash-jobs" style="padding-top:4px;padding-bottom:4px"></div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div><div class="card-title">Pending Disciplinary</div><div class="card-sub">Cases awaiting resolution</div></div><button class="btn btn-outline btn-sm" onclick="nav('disciplinary',document.querySelectorAll('.nav-item')[8])">View All</button></div>
+          <div class="card-body" id="dash-disc" style="padding-top:4px;padding-bottom:4px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Today's Attendance Snapshot</div><div class="card-sub" id="today-snap"></div></div><button class="btn btn-outline btn-sm" onclick="nav('attendance',document.querySelectorAll('.nav-item')[2])">Full Report</button></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Department</th><th>Clock In</th><th>Clock Out</th><th>Status</th></tr></thead><tbody id="dash-att-body"></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- ════ EMPLOYEES ════ -->
+    <section class="section" id="sec-employees">
+      <div class="fbar">
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search name, department, position…" oninput="filterEmps(this.value)"></div>
+        <select class="fi" id="dept-filter" onchange="filterEmpsByDept()"><option>All Departments</option><option>Admin</option><option>Finance</option><option>ICT</option><option>Operations</option><option>Programs</option><option>M&E</option></select>
+      </div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Position</th><th>Department</th><th>Phone</th><th>Basic Salary</th><th>Status</th><th>Actions</th></tr></thead><tbody id="emp-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ ATTENDANCE ════ -->
+    <section class="section" id="sec-attendance">
+      <div class="clock-panel">
+        <div class="clk-label">East Africa Time (EAT · UTC+3)</div>
+        <div class="clk-time" id="live-clk">--:--:--</div>
+        <div class="clk-tz" id="today-date-att"></div>
+        <div class="clk-acts">
+          <button class="clk-btn clk-in" id="clk-in-btn" onclick="clockAct('in')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Clock In</button>
+          <button class="clk-btn clk-out" id="clk-out-btn" onclick="clockAct('out')" style="opacity:.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Clock Out</button>
+        </div>
+      </div>
+      <div class="fbar">
+        <div class="search-box" style="max-width:200px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><input type="date" value="2026-04-05" style="border:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;background:transparent;color:var(--text)"></div>
+        <select class="fi"><option>All Status</option><option>Present</option><option>Late</option><option>Absent</option><option>On Leave</option></select>
+        <button class="btn btn-ghost btn-sm" onclick="toast('Report exported!','success')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+      </div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Dept</th><th>Clock In</th><th>Clock Out</th><th>Hours</th><th>Status</th></tr></thead><tbody id="att-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ LEAVE ════ -->
+    <section class="section" id="sec-leave">
+      <div class="g2" style="margin-bottom:13px">
+        <div class="card card-navy"><div class="card-body"><div style="font-size:12px;opacity:.55;margin-bottom:6px;font-weight:500">Annual Leave Balance (avg)</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px">18 <span style="font-size:13px;opacity:.5;font-weight:400">/ 21 days</span></div><div class="prog"><div class="prog-fill" style="width:86%"></div></div></div></div>
+        <div class="card card-amber"><div class="card-body"><div style="font-size:12px;opacity:.72;margin-bottom:6px;font-weight:500">Leave Requests — April 2026</div><div style="font-size:28px;font-weight:800;letter-spacing:-1px">7 <span style="font-size:13px;opacity:.6;font-weight:400">requests</span></div><div style="display:flex;gap:14px;margin-top:9px;font-size:12px;font-weight:600;flex-wrap:wrap;opacity:.9"><span>✅ 4 Approved</span><span id="leave-pending-count">⏳ 3 Pending</span><span>❌ 0 Rejected</span></div></div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">All Leave Requests</div><button class="btn btn-primary btn-sm" onclick="openModal('leaveModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Request</button></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead><tbody id="leave-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ PAYROLL ════ -->
+    <section class="section" id="sec-payroll">
+      <div class="pay-banner">
+        <div>
+          <div class="pay-lbl">Total Net Payroll — April 2026</div>
+          <div class="pay-amt" id="payroll-total">UGX —</div>
+          <div style="font-size:12px;opacity:.62;margin-top:3px" id="payroll-meta">— employees · 22 working days</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" style="background:rgba(255,255,255,.18);color:white;border:1.5px solid rgba(255,255,255,.3)" onclick="exportPayrollCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>
+          <button class="btn" style="background:white;color:var(--amber-dk);font-weight:700" onclick="toast('Tax summary report generating…','success')">🇺🇬 URA Report</button>
+        </div>
+      </div>
+      <!-- Tax summary cards -->
+      <div class="g3" style="margin-bottom:13px">
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><span class="chip chip-neutral">PAYE</span></div><div class="stat-val" id="stat-paye" style="font-size:18px">—</div><div class="stat-lbl">Total PAYE Deducted</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="chip chip-neutral">NSSF</span></div><div class="stat-val" id="stat-nssf" style="font-size:18px">—</div><div class="stat-lbl">Total NSSF (Emp + Empr)</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><span class="chip chip-neutral">LST</span></div><div class="stat-val" id="stat-lst" style="font-size:18px">—</div><div class="stat-lbl">Local Service Tax</div></div>
+      </div>
+      <div class="fbar">
+        <select class="fi"><option>April 2026</option><option>March 2026</option><option>February 2026</option></select>
+        <select class="fi"><option>All Departments</option><option>Admin</option><option>Finance</option><option>ICT</option><option>Operations</option></select>
+      </div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Dept</th><th>Basic Salary</th><th>PAYE</th><th>NSSF (Emp 5%)</th><th>NSSF (Empr 10%)</th><th>LST</th><th>Absence Ded.</th><th>Net Pay</th><th></th></tr></thead><tbody id="payroll-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ PERFORMANCE ════ -->
+    <section class="section" id="sec-performance">
+      <div class="g3" style="margin-bottom:13px">
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="chip chip-up">This cycle</span></div><div class="stat-val" id="perf-avg">—</div><div class="stat-lbl">Avg Performance Score</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></div><span class="chip chip-up">Excellent</span></div><div class="stat-val" id="perf-excellent">—</div><div class="stat-lbl">Excellent Performers</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg></div><span class="chip chip-down">Needs attention</span></div><div class="stat-val" id="perf-poor">—</div><div class="stat-lbl">Needs Improvement</div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">Performance Reviews — Q1 2026</div><button class="btn btn-primary btn-sm" onclick="openModal('perfModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Review</button></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Employee</th><th>Dept</th><th>Period</th><th>KPI Score</th><th>Attendance</th><th>Teamwork</th><th>Overall</th><th>Rating</th><th>Actions</th></tr></thead><tbody id="perf-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ RECRUITMENT ════ -->
+    <section class="section" id="sec-recruitment">
+      <div class="g2" style="margin-bottom:13px">
+        <div class="card card-navy"><div class="card-body"><div style="font-size:12px;opacity:.55;margin-bottom:6px;font-weight:500">Open Positions</div><div style="font-size:34px;font-weight:800;letter-spacing:-1px" id="recruit-open">—</div><div style="font-size:12px;opacity:.5;margin-top:4px">Actively recruiting</div></div></div>
+        <div class="card card-amber"><div class="card-body"><div style="font-size:12px;opacity:.72;margin-bottom:6px;font-weight:500">Total Applicants</div><div style="font-size:34px;font-weight:800;letter-spacing:-1px" id="recruit-apps">—</div><div style="font-size:12px;opacity:.72;margin-top:4px" id="recruit-breakdown">— shortlisted · — hired</div></div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">Job Openings & Applicants</div><button class="btn btn-primary btn-sm" onclick="openModal('jobModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Post Job</button></div>
+      <div class="card" style="margin-bottom:13px"><div class="tbl-wrap"><table><thead><tr><th>Job Title</th><th>Department</th><th>Posted</th><th>Applicants</th><th>Deadline</th><th>Status</th><th>Actions</th></tr></thead><tbody id="jobs-body"></tbody></table></div></div>
+      <div class="sec-hd"><div class="sec-title">All Applicants</div><button class="btn btn-outline btn-sm" onclick="openModal('applicantModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Applicant</button></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Applicant</th><th>Applied For</th><th>Date Applied</th><th>Experience</th><th>Status</th><th>Actions</th></tr></thead><tbody id="applicants-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ DISCIPLINARY ════ -->
+    <section class="section" id="sec-disciplinary">
+      <div class="g3" style="margin-bottom:13px">
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span class="chip chip-down">Open</span></div><div class="stat-val" id="disc-open">—</div><div class="stat-lbl">Active Cases</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="chip chip-up">Closed</span></div><div class="stat-val" id="disc-resolved">—</div><div class="stat-lbl">Resolved Cases</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><span class="chip chip-down">Severe</span></div><div class="stat-val" id="disc-dismissed">—</div><div class="stat-lbl">Dismissals</div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">Disciplinary Case Register</div><button class="btn btn-primary btn-sm" onclick="openModal('discModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Log Case</button></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Case Ref</th><th>Employee</th><th>Offence</th><th>Date</th><th>Hearing Date</th><th>Outcome</th><th>Status</th><th>Actions</th></tr></thead><tbody id="disc-body"></tbody></table></div></div>
+    </section>
+
+    <!-- ════ DOCUMENTS ════ -->
+    <section class="section" id="sec-documents">
+      <div class="fbar">
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Search documents…" oninput="filterDocs(this.value)"></div>
+        <select class="fi" id="doc-emp-filter" onchange="filterDocsByEmp()"><option>All Employees</option></select>
+        <select class="fi" id="doc-type-filter" onchange="filterDocsByEmp()"><option>All Types</option><option>Contract</option><option>ID</option><option>Certificate</option><option>Appraisal</option><option>Policy</option><option>Other</option></select>
+        <button class="btn btn-primary btn-sm" onclick="openModal('docModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Upload Document</button>
+      </div>
+      <div class="g2">
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="chip chip-up">Stored</span></div><div class="stat-val" id="doc-total">—</div><div class="stat-lbl">Total Documents</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="chip chip-down">Check</span></div><div class="stat-val" id="doc-expiring">—</div><div class="stat-lbl">Expiring in 30 days</div></div>
+      </div>
+      <div class="card"><div id="doc-list" style="padding:8px 18px"></div></div>
+    </section>
+
+    <!-- ════ SHIFTS ════ -->
+    <section class="section" id="sec-shifts">
+      <div class="g3" style="margin-bottom:13px">
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="chip chip-neutral">Morning</span></div><div class="stat-val" id="shift-morning">—</div><div class="stat-lbl">Morning Shifts (8am–2pm)</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><span class="chip chip-neutral">Afternoon</span></div><div class="stat-val" id="shift-afternoon">—</div><div class="stat-lbl">Afternoon (2pm–8pm)</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-ico ico-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div><span class="chip chip-neutral">Night</span></div><div class="stat-val" id="shift-night">—</div><div class="stat-lbl">Night Shifts (8pm–6am)</div></div>
+      </div>
+      <div class="card">
+        <div class="card-hd">
+          <div><div class="card-title">Weekly Roster — April 2026</div><div class="card-sub">Drag to reassign · Click cell to add shift</div></div>
+          <div style="display:flex;gap:8px">
+            <select class="fi" style="font-size:12px;padding:6px 10px"><option>Week of Apr 6</option><option>Week of Apr 13</option><option>Week of Apr 20</option></select>
+            <button class="btn btn-primary btn-sm" onclick="openModal('shiftModal')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Shift</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="roster-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════ SETTINGS ════ -->
+    <section class="section" id="sec-settings">
+      <div class="g2">
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Company Information</div></div>
+          <div class="card-body">
+            <div class="fg"><label class="fl">Company Name</label><input class="fc" value="Mentor Human Resource Services"></div>
+            <div class="fg"><label class="fl">Email</label><input class="fc" value="info@mentorhrs.org" type="email"></div>
+            <div class="fg"><label class="fl">Phone</label><input class="fc" value="+256 700 000 000"></div>
+            <div class="fg"><label class="fl">Address</label><input class="fc" value="Kampala, Uganda"></div>
+            <div class="fg"><label class="fl">TIN Number</label><input class="fc" value="1234567890" placeholder="URA TIN"></div>
+            <button class="btn btn-primary" onclick="toast('Settings saved!','success')">Save Changes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Leave & Payroll Policy</div></div>
+          <div class="card-body">
+            <div class="frow">
+              <div class="fg"><label class="fl">Annual Leave Days</label><input class="fc" value="21" type="number"></div>
+              <div class="fg"><label class="fl">Sick Leave Days</label><input class="fc" value="10" type="number"></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Work Start Time</label><input class="fc" value="08:00" type="time"></div>
+              <div class="fg"><label class="fl">Late Threshold (mins)</label><input class="fc" value="15" type="number"></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl">Working Days/Month</label><input class="fc" value="22" type="number"></div>
+              <div class="fg"><label class="fl">Currency</label><select class="fc"><option>UGX</option><option>USD</option><option>KES</option></select></div>
+            </div>
+            <button class="btn btn-primary" onclick="toast('Policy updated!','success')">Update Policy</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Uganda Tax Settings (URA)</div></div>
+          <div class="card-body">
+            <div style="background:var(--surface);border-radius:9px;padding:13px;margin-bottom:13px;font-size:12.5px;color:var(--sub);line-height:1.7">
+              <strong style="color:var(--text)">PAYE Brackets (Monthly)</strong><br>
+              0 – 235,000: 0% &nbsp;|&nbsp; 235,001 – 335,000: 10%<br>
+              335,001 – 410,000: 20% &nbsp;|&nbsp; 410,001 – 10,000,000: 30%<br>
+              Above 10,000,000: 40%
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="fl">NSSF Employee Rate</label><input class="fc" value="5" type="number">  </div>
+              <div class="fg"><label class="fl">NSSF Employer Rate</label><input class="fc" value="10" type="number"></div>
+            </div>
+            <div class="fg"><label class="fl">LST (Local Service Tax)</label><select class="fc"><option>100,000 – 200,000: UGX 5,000</option><option>200,001 – 300,000: UGX 10,000</option><option>Above 300,000: UGX 15,000</option></select></div>
+            <button class="btn btn-primary" onclick="toast('Tax settings saved!','success')">Save Tax Config</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title">Departments</div></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px" id="dept-list">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">Admin <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">Finance <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">ICT <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">Operations <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">Programs <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:var(--surface);border-radius:8px;font-size:13px;font-weight:600">M&E <button class="btn btn-danger btn-sm" onclick="toast('Department removed','error')">Remove</button></div>
+            </div>
+            <div style="display:flex;gap:8px"><input class="fc" placeholder="New department name" id="new-dept" style="flex:1"><button class="btn btn-primary" onclick="toast('Department added!','success')">Add</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- ADD EMPLOYEE -->
+<div class="overlay" id="empModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Add New Employee</div><button class="m-close" onclick="closeModal('empModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">First Name *</label><input class="fc" id="fn" placeholder="e.g. Amara"></div><div class="fg"><label class="fl">Last Name *</label><input class="fc" id="ln" placeholder="e.g. Kiggundu"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Phone</label><input class="fc" id="ph" placeholder="+256 7XX XXX XXX"></div><div class="fg"><label class="fl">Email</label><input class="fc" id="em" type="email" placeholder="name@email.com"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Department</label><select class="fc" id="dept"><option>Admin</option><option>Finance</option><option>ICT</option><option>Operations</option><option>Programs</option><option>M&E</option></select></div><div class="fg"><label class="fl">Position</label><input class="fc" id="pos" placeholder="e.g. HR Officer"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Basic Salary (UGX)</label><input class="fc" id="sal" type="number" placeholder="e.g. 1500000"></div><div class="fg"><label class="fl">Start Date</label><input class="fc" id="sd" type="date"></div></div>
+      <div class="fg"><label class="fl">National ID / Passport No.</label><input class="fc" id="nid" placeholder="e.g. CM12345678Z"></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('empModal')">Cancel</button><button class="btn btn-primary" onclick="addEmp()">Save Employee</button></div>
+  </div>
+</div>
+
+<!-- EDIT EMPLOYEE -->
+<div class="overlay" id="editModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Edit Employee</div><button class="m-close" onclick="closeModal('editModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">First Name *</label><input class="fc" id="efn"></div><div class="fg"><label class="fl">Last Name *</label><input class="fc" id="eln"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Phone</label><input class="fc" id="eph"></div><div class="fg"><label class="fl">Email</label><input class="fc" id="eem" type="email"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Department</label><select class="fc" id="edept"><option>Admin</option><option>Finance</option><option>ICT</option><option>Operations</option><option>Programs</option><option>M&E</option></select></div><div class="fg"><label class="fl">Position</label><input class="fc" id="epos"></div></div>
+      <div class="fg"><label class="fl">Basic Salary (UGX)</label><input class="fc" id="esal" type="number"></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('editModal')">Cancel</button><button class="btn btn-primary" onclick="saveEdit()">Save Changes</button></div>
+  </div>
+</div>
+
+<!-- LEAVE REQUEST -->
+<div class="overlay" id="leaveModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">New Leave Request</div><button class="m-close" onclick="closeModal('leaveModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="fg"><label class="fl">Employee</label><select class="fc" id="lv-emp"></select></div>
+      <div class="fg"><label class="fl">Leave Type</label><select class="fc" id="lv-type"><option>Annual Leave</option><option>Sick Leave</option><option>Emergency Leave</option><option>Maternity / Paternity</option><option>Study Leave</option></select></div>
+      <div class="frow"><div class="fg"><label class="fl">From</label><input class="fc" type="date" id="lv-from"></div><div class="fg"><label class="fl">To</label><input class="fc" type="date" id="lv-to"></div></div>
+      <div class="fg"><label class="fl">Reason</label><textarea class="fc" id="lv-reason" rows="3" placeholder="Briefly explain the reason…"></textarea></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('leaveModal')">Cancel</button><button class="btn btn-primary" onclick="submitLeave()">Submit Request</button></div>
+  </div>
+</div>
+
+<!-- PAYSLIP -->
+<div class="overlay" id="payslipModal">
+  <div class="modal" style="max-width:440px">
+    <div class="m-hd"><div class="m-title">Payslip Preview</div><button class="m-close" onclick="closeModal('payslipModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div style="background:linear-gradient(135deg,var(--navy),var(--navy-lt));border-radius:10px;padding:18px;color:white;margin-bottom:16px;text-align:center">
+        <div style="font-size:9.5px;letter-spacing:2.5px;opacity:.45;text-transform:uppercase;font-weight:700">Mentor HRMS · Official Payslip</div>
+        <div style="font-size:19px;font-weight:800;margin-top:8px;letter-spacing:-.3px" id="ps-name">—</div>
+        <div style="font-size:12px;opacity:.55;margin-top:3px" id="ps-pos">—</div>
+        <span style="display:inline-block;background:var(--amber);color:white;font-size:11.5px;font-weight:700;padding:4px 14px;border-radius:20px;margin-top:10px" id="ps-period">—</span>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin-bottom:8px">Earnings</div>
+      <div class="ded-row"><span class="ded-lbl">Basic Salary</span><span class="ded-amt" id="ps-basic">—</span></div>
+      <div class="ded-row"><span class="ded-lbl">Days Worked</span><span class="ded-amt" id="ps-days">—</span></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin:12px 0 8px">Deductions</div>
+      <div class="ded-row"><span class="ded-lbl">PAYE (URA)</span><span class="ded-amt ded-red" id="ps-paye">—</span></div>
+      <div class="ded-row"><span class="ded-lbl">NSSF Employee (5%)</span><span class="ded-amt ded-red" id="ps-nssf-emp">—</span></div>
+      <div class="ded-row"><span class="ded-lbl">LST (Local Service Tax)</span><span class="ded-amt ded-red" id="ps-lst">—</span></div>
+      <div class="ded-row"><span class="ded-lbl">Absence Deduction</span><span class="ded-amt ded-red" id="ps-deduct">—</span></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sub);margin:12px 0 8px">Employer Contributions</div>
+      <div class="ded-row"><span class="ded-lbl">NSSF Employer (10%)</span><span class="ded-amt ded-green" id="ps-nssf-empr">—</span></div>
+      <div class="ded-row total" style="border-top:2px solid var(--border);margin-top:4px"><span>Net Pay</span><span style="color:var(--navy);font-size:20px" id="ps-net">—</span></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('payslipModal')">Close</button><button class="btn btn-primary" onclick="toast('PDF download coming soon!','success')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>
+  </div>
+</div>
+
+<!-- PERFORMANCE REVIEW -->
+<div class="overlay" id="perfModal">
+  <div class="modal modal-lg">
+    <div class="m-hd"><div class="m-title">New Performance Review</div><button class="m-close" onclick="closeModal('perfModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">Employee *</label><select class="fc" id="pf-emp"></select></div><div class="fg"><label class="fl">Review Period</label><select class="fc" id="pf-period"><option>Q1 2026 (Jan–Mar)</option><option>Q2 2026 (Apr–Jun)</option><option>Q3 2026 (Jul–Sep)</option><option>Q4 2026 (Oct–Dec)</option></select></div></div>
+      <div style="font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px">KPI Scores (0–100)</div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Job Performance</label><input class="fc" id="pf-kpi1" type="number" min="0" max="100" placeholder="0–100"></div>
+        <div class="fg"><label class="fl">Attendance & Punctuality</label><input class="fc" id="pf-kpi2" type="number" min="0" max="100" placeholder="0–100"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Teamwork & Collaboration</label><input class="fc" id="pf-kpi3" type="number" min="0" max="100" placeholder="0–100"></div>
+        <div class="fg"><label class="fl">Initiative & Innovation</label><input class="fc" id="pf-kpi4" type="number" min="0" max="100" placeholder="0–100"></div>
+      </div>
+      <div class="fg"><label class="fl">Reviewer Comments</label><textarea class="fc" id="pf-notes" rows="3" placeholder="Optional notes…"></textarea></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('perfModal')">Cancel</button><button class="btn btn-primary" onclick="submitPerf()">Save Review</button></div>
+  </div>
+</div>
+
+<!-- POST JOB -->
+<div class="overlay" id="jobModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Post New Job Opening</div><button class="m-close" onclick="closeModal('jobModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="fg"><label class="fl">Job Title *</label><input class="fc" id="job-title" placeholder="e.g. Finance Officer"></div>
+      <div class="frow"><div class="fg"><label class="fl">Department</label><select class="fc" id="job-dept"><option>Admin</option><option>Finance</option><option>ICT</option><option>Operations</option><option>Programs</option><option>M&E</option></select></div><div class="fg"><label class="fl">Application Deadline</label><input class="fc" type="date" id="job-deadline"></div></div>
+      <div class="fg"><label class="fl">Job Description</label><textarea class="fc" id="job-desc" rows="4" placeholder="Key responsibilities and requirements…"></textarea></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('jobModal')">Cancel</button><button class="btn btn-primary" onclick="postJob()">Post Job</button></div>
+  </div>
+</div>
+
+<!-- ADD APPLICANT -->
+<div class="overlay" id="applicantModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Add Applicant</div><button class="m-close" onclick="closeModal('applicantModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">First Name *</label><input class="fc" id="ap-fn" placeholder="First name"></div><div class="fg"><label class="fl">Last Name *</label><input class="fc" id="ap-ln" placeholder="Last name"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Phone</label><input class="fc" id="ap-ph" placeholder="+256 7XX XXX XXX"></div><div class="fg"><label class="fl">Email</label><input class="fc" id="ap-em" type="email" placeholder="name@email.com"></div></div>
+      <div class="frow"><div class="fg"><label class="fl">Applying For</label><select class="fc" id="ap-job"></select></div><div class="fg"><label class="fl">Years Experience</label><input class="fc" id="ap-exp" type="number" placeholder="e.g. 3"></div></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('applicantModal')">Cancel</button><button class="btn btn-primary" onclick="addApplicant()">Save Applicant</button></div>
+  </div>
+</div>
+
+<!-- DISCIPLINARY CASE -->
+<div class="overlay" id="discModal">
+  <div class="modal modal-lg">
+    <div class="m-hd"><div class="m-title">Log Disciplinary Case</div><button class="m-close" onclick="closeModal('discModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">Employee *</label><select class="fc" id="dc-emp"></select></div><div class="fg"><label class="fl">Date of Offence *</label><input class="fc" type="date" id="dc-date"></div></div>
+      <div class="fg"><label class="fl">Offence / Misconduct *</label><input class="fc" id="dc-offence" placeholder="e.g. Insubordination, Absenteeism, Fraud…"></div>
+      <div class="frow"><div class="fg"><label class="fl">Severity</label><select class="fc" id="dc-severity"><option>Minor</option><option>Moderate</option><option>Gross Misconduct</option></select></div><div class="fg"><label class="fl">Hearing Date</label><input class="fc" type="date" id="dc-hearing"></div></div>
+      <div class="fg"><label class="fl">Details / Evidence</label><textarea class="fc" id="dc-notes" rows="3" placeholder="Describe the incident…"></textarea></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('discModal')">Cancel</button><button class="btn btn-primary" onclick="logCase()">Log Case</button></div>
+  </div>
+</div>
+
+<!-- UPLOAD DOCUMENT -->
+<div class="overlay" id="docModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Upload Document</div><button class="m-close" onclick="closeModal('docModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="frow"><div class="fg"><label class="fl">Employee</label><select class="fc" id="doc-emp"></select></div><div class="fg"><label class="fl">Document Type</label><select class="fc" id="doc-type"><option>Contract</option><option>ID</option><option>Certificate</option><option>Appraisal</option><option>Policy</option><option>Other</option></select></div></div>
+      <div class="fg"><label class="fl">Document Name *</label><input class="fc" id="doc-name" placeholder="e.g. Employment Contract 2026"></div>
+      <div class="frow"><div class="fg"><label class="fl">File (simulated)</label><input class="fc" id="doc-file" type="text" placeholder="filename.pdf"></div><div class="fg"><label class="fl">Expiry Date (if any)</label><input class="fc" type="date" id="doc-expiry"></div></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('docModal')">Cancel</button><button class="btn btn-primary" onclick="uploadDoc()">Upload</button></div>
+  </div>
+</div>
+
+<!-- ADD SHIFT -->
+<div class="overlay" id="shiftModal">
+  <div class="modal">
+    <div class="m-hd"><div class="m-title">Assign Shift</div><button class="m-close" onclick="closeModal('shiftModal')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="m-body">
+      <div class="fg"><label class="fl">Employee *</label><select class="fc" id="sh-emp"></select></div>
+      <div class="frow"><div class="fg"><label class="fl">Day</label><select class="fc" id="sh-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div><div class="fg"><label class="fl">Shift Type</label><select class="fc" id="sh-type"><option value="morning">Morning (8am–2pm)</option><option value="afternoon">Afternoon (2pm–8pm)</option><option value="night">Night (8pm–6am)</option></select></div></div>
+    </div>
+    <div class="m-foot"><button class="btn btn-outline" onclick="closeModal('shiftModal')">Cancel</button><button class="btn btn-primary" onclick="assignShift()">Assign Shift</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast-box"></div>
+
+<script>
+/* ══════════════ DATA ══════════════ */
+const EMPS=[
+  {fn:'Amara', ln:'Kiggundu',ph:'+256 701 123 456',em:'amara@mentor.org', dept:'Finance',   pos:'Accountant',      sal:1800000,col:'#1B3272',nid:'CM90123456A'},
+  {fn:'Brian', ln:'Nsubuga', ph:'+256 772 345 678',em:'brian@mentor.org', dept:'ICT',        pos:'IT Officer',      sal:1500000,col:'#F59E0B',nid:'CM90234567B'},
+  {fn:'Joan',  ln:'Mutesi',  ph:'+256 782 456 789',em:'joan@mentor.org',  dept:'Admin',      pos:'Admin Officer',   sal:1200000,col:'#059669',nid:'CM90345678C'},
+  {fn:'Peter', ln:'Okello',  ph:'+256 756 567 890',em:'peter@mentor.org', dept:'Operations', pos:'Ops Manager',     sal:2200000,col:'#7C3AED',nid:'CM90456789D'},
+  {fn:'Ruth',  ln:'Katende', ph:'+256 703 678 901',em:'ruth@mentor.org',  dept:'Finance',    pos:'Finance Officer', sal:1600000,col:'#DC2626',nid:'CM90567890E'},
+  {fn:'David', ln:'Mugisha', ph:'+256 714 789 012',em:'david@mentor.org', dept:'Admin',      pos:'Receptionist',    sal:900000, col:'#0891B2',nid:'CM90678901F'},
+];
+const LEAVES=[
+  {id:0,emp:'Amara Kiggundu',col:'#1B3272',init:'AK',type:'Annual Leave',from:'Apr 7', to:'Apr 11',days:5,reason:'Family visit',      status:'pending'},
+  {id:1,emp:'Brian Nsubuga', col:'#F59E0B',init:'BN',type:'Sick Leave',  from:'Apr 5', to:'Apr 6', days:2,reason:'Doctor appointment',status:'pending'},
+  {id:2,emp:'Joan Mutesi',   col:'#059669',init:'JM',type:'Emergency',   from:'Apr 5', to:'Apr 5', days:1,reason:'Family emergency',  status:'pending'},
+  {id:3,emp:'Peter Okello',  col:'#7C3AED',init:'PO',type:'Annual Leave',from:'Mar 24',to:'Mar 28',days:5,reason:'Vacation',          status:'approved'},
+];
+const ATTENDANCE=[
+  {emp:'Amara Kiggundu',col:'#1B3272',init:'AK',dept:'Finance',   clockIn:'08:02 AM',clockOut:null,status:'present',absentDays:1},
+  {emp:'Brian Nsubuga', col:'#F59E0B',init:'BN',dept:'ICT',        clockIn:null,      clockOut:null,status:'leave',  absentDays:0},
+  {emp:'Joan Mutesi',   col:'#059669',init:'JM',dept:'Admin',      clockIn:'09:15 AM',clockOut:null,status:'late',   absentDays:0},
+  {emp:'Peter Okello',  col:'#7C3AED',init:'PO',dept:'Operations', clockIn:'07:58 AM',clockOut:null,status:'present',absentDays:0},
+  {emp:'Ruth Katende',  col:'#DC2626',init:'RK',dept:'Finance',    clockIn:null,      clockOut:null,status:'absent', absentDays:4},
+  {emp:'David Mugisha', col:'#0891B2',init:'DM',dept:'Admin',      clockIn:'08:30 AM',clockOut:null,status:'present',absentDays:0},
+];
+const PERFORMANCE=[
+  {emp:'Amara Kiggundu',col:'#1B3272',init:'AK',dept:'Finance',   period:'Q1 2026',kpi:88,att:90,team:85,init4:80,notes:'Strong performer'},
+  {emp:'Brian Nsubuga', col:'#F59E0B',init:'BN',dept:'ICT',        period:'Q1 2026',kpi:92,att:78,team:90,init4:95,notes:'Excellent tech skills'},
+  {emp:'Joan Mutesi',   col:'#059669',init:'JM',dept:'Admin',      period:'Q1 2026',kpi:70,att:85,team:80,init4:65,notes:'Needs improvement on KPIs'},
+  {emp:'Peter Okello',  col:'#7C3AED',init:'PO',dept:'Operations', period:'Q1 2026',kpi:95,att:92,team:94,init4:90,notes:'Outstanding leadership'},
+  {emp:'Ruth Katende',  col:'#DC2626',init:'RK',dept:'Finance',    period:'Q1 2026',kpi:55,att:60,team:70,init4:58,notes:'Attendance concerns'},
+  {emp:'David Mugisha', col:'#0891B2',init:'DM',dept:'Admin',      period:'Q1 2026',kpi:78,att:88,team:82,init4:75,notes:'Steady and reliable'},
+];
+const JOBS=[
+  {id:1,title:'Programs Officer',   dept:'Programs',   posted:'Mar 15, 2026',deadline:'Apr 20, 2026',status:'open',   desc:'Lead field programs'},
+  {id:2,title:'M&E Specialist',     dept:'M&E',        posted:'Mar 20, 2026',deadline:'Apr 25, 2026',status:'open',   desc:'Monitor & evaluation'},
+  {id:3,title:'Finance Assistant',  dept:'Finance',    posted:'Feb 28, 2026',deadline:'Mar 30, 2026',status:'open',   desc:'Support finance team'},
+];
+const APPLICANTS=[
+  {fn:'Grace',  ln:'Namutebi', ph:'+256 771 111 111',em:'grace@email.com', job:'Programs Officer',   exp:3, status:'shortlisted',col:'#7C3AED'},
+  {fn:'Moses',  ln:'Waiswa',   ph:'+256 772 222 222',em:'moses@email.com', job:'M&E Specialist',     exp:5, status:'interview',  col:'#059669'},
+  {fn:'Sarah',  ln:'Auma',     ph:'+256 773 333 333',em:'sarah@email.com', job:'Finance Assistant',  exp:2, status:'pending',    col:'#DC2626'},
+  {fn:'John',   ln:'Byamugisha',ph:'+256 774 444 444',em:'john@email.com', job:'Programs Officer',   exp:4, status:'hired',      col:'#1B3272'},
+];
+const DISCIPLINARY=[
+  {id:'DC-001',emp:'Ruth Katende',  col:'#DC2626',init:'RK',offence:'Unauthorised Absence',  date:'Mar 10, 2026',hearing:'Mar 17, 2026',outcome:'Written Warning',status:'resolved'},
+  {id:'DC-002',emp:'David Mugisha', col:'#0891B2',init:'DM',offence:'Late Reporting',         date:'Mar 22, 2026',hearing:'Mar 29, 2026',outcome:'Verbal Warning',  status:'resolved'},
+  {id:'DC-003',emp:'Joan Mutesi',   col:'#059669',init:'JM',offence:'Insubordination',        date:'Apr 1, 2026', hearing:'Apr 10, 2026',outcome:'Pending',          status:'open'},
+];
+const DOCUMENTS=[
+  {id:1,emp:'Amara Kiggundu',type:'Contract',  name:'Employment Contract 2024',    file:'amara_contract.pdf', expiry:'Dec 31, 2026',col:'#1B3272'},
+  {id:2,emp:'Brian Nsubuga', type:'ID',         name:'National ID Copy',            file:'brian_nid.pdf',      expiry:null,           col:'#F59E0B'},
+  {id:3,emp:'Joan Mutesi',   type:'Certificate',name:'Degree Certificate – Makerere',file:'joan_degree.pdf',  expiry:null,           col:'#059669'},
+  {id:4,emp:'Peter Okello',  type:'Appraisal',  name:'2025 Annual Appraisal',       file:'peter_appraisal.pdf',expiry:null,          col:'#7C3AED'},
+  {id:5,emp:'Ruth Katende',  type:'Contract',   name:'Employment Contract 2023',    file:'ruth_contract.pdf',  expiry:'Apr 30, 2026', col:'#DC2626'},
+  {id:6,emp:'David Mugisha', type:'Policy',     name:'Staff Handbook Acknowledgement',file:'david_policy.pdf',expiry:null,           col:'#0891B2'},
+];
+const SHIFTS=[
+  {emp:'Amara Kiggundu',col:'#1B3272',day:'Monday',   type:'morning'},
+  {emp:'Brian Nsubuga', col:'#F59E0B',day:'Monday',   type:'afternoon'},
+  {emp:'Joan Mutesi',   col:'#059669',day:'Tuesday',  type:'morning'},
+  {emp:'Peter Okello',  col:'#7C3AED',day:'Wednesday',type:'morning'},
+  {emp:'Ruth Katende',  col:'#DC2626',day:'Thursday', type:'afternoon'},
+  {emp:'David Mugisha', col:'#0891B2',day:'Friday',   type:'morning'},
+  {emp:'Amara Kiggundu',col:'#1B3272',day:'Thursday', type:'afternoon'},
+  {emp:'Brian Nsubuga', col:'#F59E0B',day:'Friday',   type:'morning'},
+];
+
+let adminClockedIn=false,_editIdx=-1;
+
+/* ══ PAGES CONFIG ══ */
+const PAGES={
+  dashboard:    {title:'Dashboard Overview',        sub:"Welcome back — here's what's happening today",   btn:'Add Employee'},
+  employees:    {title:'Employee Management',        sub:'Manage your team members',                        btn:'Add Employee'},
+  attendance:   {title:'Attendance Tracking',        sub:'Monitor daily staff attendance',                  btn:'Mark Attendance'},
+  leave:        {title:'Leave Management',           sub:'Review and approve leave requests',               btn:'New Request'},
+  payroll:      {title:'Payroll & Tax',              sub:'PAYE · NSSF · LST — Uganda Revenue Authority',   btn:'Export CSV'},
+  performance:  {title:'Performance Management',     sub:'KPI reviews and appraisals — Q1 2026',           btn:'New Review'},
+  recruitment:  {title:'Recruitment & Onboarding',  sub:'Job pipeline and applicant tracking',             btn:'Post Job'},
+  disciplinary: {title:'Disciplinary Register',      sub:'Case log and hearing outcomes',                   btn:'Log Case'},
+  documents:    {title:'Document Management',        sub:'Contracts, IDs, certificates and appraisals',    btn:'Upload'},
+  shifts:       {title:'Shift Roster',               sub:'Weekly scheduling and shift assignments',         btn:'Add Shift'},
+  settings:     {title:'System Settings',            sub:'Configure your HRMS preferences',                 btn:'Save'},
+};
+
+/* ══ HELPERS ══ */
+function fmtSal(n){return Number(n).toLocaleString('en-UG');}
+function empName(e){return `${e.fn} ${e.ln}`;}
+
+/* ══ UGANDA TAX CALCULATIONS ══ */
+function calcPAYE(monthly){
+  // Uganda URA PAYE monthly brackets
+  if(monthly<=235000) return 0;
+  if(monthly<=335000) return (monthly-235000)*0.10;
+  if(monthly<=410000) return 10000+(monthly-335000)*0.20;
+  if(monthly<=10000000) return 25000+(monthly-410000)*0.30;
+  return 25000+(10000000-410000)*0.30+(monthly-10000000)*0.40;
+}
+function calcNSSF_emp(sal){return Math.round(sal*0.05);}
+function calcNSSF_empr(sal){return Math.round(sal*0.10);}
+function calcLST(sal){
+  if(sal<100000) return 0;
+  if(sal<=200000) return 5000;
+  if(sal<=300000) return 10000;
+  return 15000;
+}
+function calcAbsenceDed(sal,absDays,wDays=22){
+  if(!absDays) return 0;
+  return Math.round((absDays/wDays)*sal);
+}
+function calcNetPay(sal,absDays=0){
+  const paye=Math.round(calcPAYE(sal));
+  const nssfEmp=calcNSSF_emp(sal);
+  const lst=calcLST(sal);
+  const absDed=calcAbsenceDed(sal,absDays);
+  return {paye,nssfEmp,nssfEmpr:calcNSSF_empr(sal),lst,absDed,net:sal-paye-nssfEmp-lst-absDed};
+}
+
+/* ══ STATS ══ */
+function updateStats(){
+  const t=EMPS.length;
+  const p=ATTENDANCE.filter(a=>['present','late'].includes(a.status)).length;
+  const l=ATTENDANCE.filter(a=>a.status==='leave').length;
+  const ab=ATTENDANCE.filter(a=>a.status==='absent').length;
+  const pend=LEAVES.filter(x=>x.status==='pending').length;
+  [['stat-total',t],['stat-present',p],['stat-leave',l],['stat-absent',ab]].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+  const pct=t>0?Math.round((p/t)*100):0;
+  const pp=document.getElementById('stat-present-pct');if(pp)pp.textContent=pct+'%';
+  const dc=document.getElementById('dash-emp-count');if(dc)dc.textContent=t+' staff';
+  const b=document.getElementById('leave-nav-badge');if(b){b.textContent=pend;b.style.display=pend>0?'':'none';}
+  const c=document.getElementById('stat-pending-chip');if(c)c.textContent=pend+' pending';
+  const lpc=document.getElementById('leave-pending-count');if(lpc)lpc.textContent=`⏳ ${pend} Pending`;
+  // payroll totals
+  let totNet=0,totPaye=0,totNssf=0,totLst=0;
+  EMPS.forEach(e=>{
+    const att=ATTENDANCE.find(a=>a.emp===empName(e));
+    const abs=att?att.absentDays:0;
+    const t=calcNetPay(e.sal,abs);
+    totNet+=t.net;totPaye+=t.paye;totNssf+=(t.nssfEmp+t.nssfEmpr);totLst+=t.lst;
+  });
+  const pt=document.getElementById('payroll-total');if(pt)pt.textContent='UGX '+fmtSal(Math.round(totNet));
+  const pm=document.getElementById('payroll-meta');if(pm)pm.textContent=`${EMPS.length} employees · 22 working days`;
+  const sp=document.getElementById('stat-paye');if(sp)sp.textContent='UGX '+fmtSal(Math.round(totPaye));
+  const sn=document.getElementById('stat-nssf');if(sn)sn.textContent='UGX '+fmtSal(Math.round(totNssf));
+  const sl=document.getElementById('stat-lst');if(sl)sl.textContent='UGX '+fmtSal(Math.round(totLst));
+  // recruitment
+  const openJobs=JOBS.filter(j=>j.status==='open').length;
+  const rb=document.getElementById('recruit-nav-badge');if(rb){rb.textContent=openJobs;rb.style.display=openJobs>0?'':'none';}
+  const ro=document.getElementById('recruit-open');if(ro)ro.textContent=openJobs;
+  const ra=document.getElementById('recruit-apps');if(ra)ra.textContent=APPLICANTS.length;
+  const rbr=document.getElementById('recruit-breakdown');
+  if(rbr)rbr.textContent=`${APPLICANTS.filter(a=>a.status==='shortlisted').length} shortlisted · ${APPLICANTS.filter(a=>a.status==='hired').length} hired`;
+  // disciplinary
+  const dopen=DISCIPLINARY.filter(d=>d.status==='open').length;
+  const db2=document.getElementById('disc-nav-badge');if(db2){db2.textContent=dopen;db2.style.display=dopen>0?'':'none';}
+  const do2=document.getElementById('disc-open');if(do2)do2.textContent=dopen;
+  const dr=document.getElementById('disc-resolved');if(dr)dr.textContent=DISCIPLINARY.filter(d=>d.status==='resolved').length;
+  const dd=document.getElementById('disc-dismissed');if(dd)dd.textContent=DISCIPLINARY.filter(d=>d.outcome==='Dismissed').length;
+  // performance
+  const avgs=PERFORMANCE.map(p=>Math.round((p.kpi+p.att+p.team+p.init4)/4));
+  const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length):0;
+  const pav=document.getElementById('perf-avg');if(pav)pav.textContent=avg+'%';
+  const pex=document.getElementById('perf-excellent');if(pex)pex.textContent=avgs.filter(s=>s>=85).length;
+  const pp2=document.getElementById('perf-poor');if(pp2)pp2.textContent=avgs.filter(s=>s<65).length;
+  // documents
+  const dt=document.getElementById('doc-total');if(dt)dt.textContent=DOCUMENTS.length;
+  const de=document.getElementById('doc-expiring');if(de)de.textContent=DOCUMENTS.filter(d=>d.expiry).length;
+  // shifts
+  const sm=document.getElementById('shift-morning');if(sm)sm.textContent=SHIFTS.filter(s=>s.type==='morning').length;
+  const sa=document.getElementById('shift-afternoon');if(sa)sa.textContent=SHIFTS.filter(s=>s.type==='afternoon').length;
+  const sn2=document.getElementById('shift-night');if(sn2)sn2.textContent=SHIFTS.filter(s=>s.type==='night').length;
+}
+
+/* ══ POPULATE SELECT DROPDOWNS ══ */
+function populateEmpSelects(){
+  const ids=['lv-emp','pf-emp','dc-emp','doc-emp','sh-emp'];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.innerHTML=EMPS.map(e=>`<option>${empName(e)}</option>`).join('');
+  });
+  const df=document.getElementById('doc-emp-filter');
+  if(df)df.innerHTML='<option>All Employees</option>'+EMPS.map(e=>`<option>${empName(e)}</option>`).join('');
+}
+function populateJobSelects(){
+  const el=document.getElementById('ap-job');if(!el)return;
+  el.innerHTML=JOBS.map(j=>`<option>${j.title}</option>`).join('');
+}
+
+/* ══ EMPLOYEES ══ */
+function renderEmps(data){
+  document.getElementById('emp-body').innerHTML=data.map(e=>`
+    <tr>
+      <td><div class="ec"><div class="av" style="background:${e.col}">${e.fn[0]}${e.ln[0]}</div><div><div class="en">${e.fn} ${e.ln}</div><div class="ee">${e.em}</div></div></div></td>
+      <td>${e.pos}</td><td>${e.dept}</td><td style="white-space:nowrap">${e.ph}</td>
+      <td style="white-space:nowrap">UGX ${fmtSal(e.sal)}</td>
+      <td><span class="badge b-active">Active</span></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn btn-outline btn-sm" onclick="openEditModal(${EMPS.indexOf(e)})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete(${EMPS.indexOf(e)})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+function filterEmps(v){const d=document.getElementById('dept-filter').value;renderEmps(EMPS.filter(e=>`${e.fn} ${e.ln} ${e.dept} ${e.pos}`.toLowerCase().includes(v.toLowerCase())&&(d==='All Departments'||e.dept===d)));}
+function filterEmpsByDept(){filterEmps(document.querySelector('#sec-employees .search-box input')?.value||'');}
+function confirmDelete(i){const e=EMPS[i];if(confirm(`Remove ${e.fn} ${e.ln}?`)){EMPS.splice(i,1);renderEmps(EMPS);updateStats();toast(`${e.fn} ${e.ln} removed`,'error');}}
+function openEditModal(i){_editIdx=i;const e=EMPS[i];['efn','eln','eph','eem','epos','esal'].forEach((id,j)=>{document.getElementById(id).value=[e.fn,e.ln,e.ph==='—'?'':e.ph,e.em==='—'?'':e.em,e.pos==='—'?'':e.pos,e.sal][j];});document.getElementById('edept').value=e.dept;openModal('editModal');}
+function saveEdit(){if(_editIdx<0)return;const e=EMPS[_editIdx],fn=document.getElementById('efn').value.trim(),ln=document.getElementById('eln').value.trim();if(!fn||!ln){toast('Name is required','error');return;}e.fn=fn;e.ln=ln;e.ph=document.getElementById('eph').value||'—';e.em=document.getElementById('eem').value||'—';e.dept=document.getElementById('edept').value;e.pos=document.getElementById('epos').value||'—';e.sal=parseInt(document.getElementById('esal').value)||e.sal;renderEmps(EMPS);updateStats();closeModal('editModal');toast(`${fn} ${ln} updated!`,'success');}
+function addEmp(){
+  const fn=document.getElementById('fn').value.trim(),ln=document.getElementById('ln').value.trim();
+  if(!fn||!ln){toast('First and last name required','error');return;}
+  const cols=['#1B3272','#F59E0B','#059669','#7C3AED','#DC2626','#0891B2','#BE185D'];
+  EMPS.push({fn,ln,ph:document.getElementById('ph').value||'—',em:document.getElementById('em').value||'—',dept:document.getElementById('dept').value,pos:document.getElementById('pos').value||'—',sal:parseInt(document.getElementById('sal').value)||0,col:cols[Math.floor(Math.random()*cols.length)],nid:document.getElementById('nid').value||'—'});
+  renderEmps(EMPS);updateStats();populateEmpSelects();closeModal('empModal');
+  ['fn','ln','ph','em','pos','sal','nid'].forEach(id=>document.getElementById(id).value='');
+  toast(`${fn} ${ln} added!`,'success');
+}
+
+/* ══ LEAVES ══ */
+function leaveAction(id,action){const l=LEAVES.find(x=>x.id===id);if(!l)return;l.status=action;renderLeaves();renderDashboardLeaves();updateStats();toast(action==='approved'?`✅ Approved for ${l.emp}`:`Leave rejected for ${l.emp}`,action==='approved'?'success':'error');}
+function renderLeaves(){const tb=document.getElementById('leave-body');if(!tb)return;tb.innerHTML=LEAVES.map(l=>{const bc={approved:'b-approved',rejected:'b-rejected',pending:'b-pending'}[l.status],bl=l.status.charAt(0).toUpperCase()+l.status.slice(1),act=l.status==='pending'?`<div style="display:flex;gap:5px"><button class="btn btn-success btn-sm" onclick="leaveAction(${l.id},'approved')">Approve</button><button class="btn btn-danger btn-sm" onclick="leaveAction(${l.id},'rejected')">Reject</button></div>`:`<span style="font-size:12px;color:var(--sub)">${l.status==='approved'?'✓ Done':'✗ Done'}</span>`;return`<tr><td><div class="ec"><div class="av" style="background:${l.col}">${l.init}</div><div class="en">${l.emp}</div></div></td><td style="white-space:nowrap">${l.type}</td><td>${l.from}</td><td>${l.to}</td><td>${l.days}</td><td>${l.reason}</td><td><span class="badge ${bc}">${bl}</span></td><td>${act}</td></tr>`;}).join('');}
+function renderDashboardLeaves(){const c=document.getElementById('dash-leaves');if(!c)return;const pending=LEAVES.filter(l=>l.status==='pending');if(!pending.length){c.innerHTML='<div style="text-align:center;padding:22px 0;color:var(--sub);font-size:13px">🎉 All leave requests reviewed!</div>';return;}c.innerHTML=pending.map(l=>`<div class="li"><div class="av" style="background:${l.col}">${l.init}</div><div class="li-info"><div class="li-name">${l.emp}</div><div class="li-meta">${l.type} · ${l.from}–${l.to} (${l.days} day${l.days>1?'s':''})</div></div><div class="li-act"><button class="btn btn-success btn-sm" onclick="leaveAction(${l.id},'approved')">✓</button><button class="btn btn-danger btn-sm" onclick="leaveAction(${l.id},'rejected')">✗</button></div></div>`).join('');}
+function submitLeave(){const emp=document.getElementById('lv-emp').value,type=document.getElementById('lv-type').value,from=document.getElementById('lv-from').value,to=document.getElementById('lv-to').value,reason=document.getElementById('lv-reason').value.trim();if(!from||!to){toast('Select start and end dates','error');return;}const fd=new Date(from),td=new Date(to);if(td<fd){toast('End date must be after start date','error');return;}const days=Math.ceil((td-fd)/86400000)+1,empData=EMPS.find(e=>empName(e)===emp)||{col:'#1B3272'},init=emp.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(),fmt=d=>new Date(d).toLocaleDateString('en-UG',{month:'short',day:'numeric'});LEAVES.push({id:Date.now(),emp,col:empData.col,init,type,from:fmt(from),to:fmt(to),days,reason:reason||'Not specified',status:'pending'});renderLeaves();renderDashboardLeaves();updateStats();closeModal('leaveModal');toast(`Leave submitted for ${emp}!`,'success');}
+
+/* ══ ATTENDANCE ══ */
+const statusMap={present:'b-present',late:'b-late',absent:'b-absent',leave:'b-leave'},labelMap={present:'Present',late:'Late',absent:'Absent',leave:'On Leave'};
+function renderAttendance(){
+  const tb=document.getElementById('att-body');if(!tb)return;
+  tb.innerHTML=ATTENDANCE.map(a=>`<tr><td><div class="ec"><div class="av" style="background:${a.col}">${a.init}</div><div><div class="en">${a.emp}</div></div></div></td><td>${a.dept}</td><td>${a.clockIn||'—'}</td><td>${a.clockOut||'—'}</td><td>${a.clockIn&&a.clockOut?calcHours(a.clockIn,a.clockOut):'—'}</td><td><span class="badge ${statusMap[a.status]}">${labelMap[a.status]}</span></td></tr>`).join('');
+  const db=document.getElementById('dash-att-body');if(!db)return;
+  db.innerHTML=ATTENDANCE.slice(0,5).map(a=>`<tr><td><div class="ec"><div class="av" style="background:${a.col}">${a.init}</div><div><div class="en">${a.emp}</div></div></div></td><td>${a.dept}</td><td>${a.clockIn||'—'}</td><td>${a.clockOut||'—'}</td><td><span class="badge ${statusMap[a.status]}">${labelMap[a.status]}</span></td></tr>`).join('');
+}
+function calcHours(i,o){try{const p=t=>{const[time,m]=t.split(' ');let[h,min]=time.split(':').map(Number);if(m==='PM'&&h!==12)h+=12;if(m==='AM'&&h===12)h=0;return h*60+min;};const d=p(o)-p(i);if(d<=0)return'—';return`${Math.floor(d/60)}h ${d%60}m`;}catch{return'—';}}
+function clockAct(type){const now=new Date().toLocaleTimeString('en-UG',{hour:'2-digit',minute:'2-digit',hour12:true});if(type==='in'){if(adminClockedIn){toast('Already clocked in!','error');return;}adminClockedIn=true;const ex=ATTENDANCE.find(a=>a.emp==='Admin — Mentor');if(!ex)ATTENDANCE.push({emp:'Admin — Mentor',col:'#F59E0B',init:'HR',dept:'Admin',clockIn:now,clockOut:null,status:'present',absentDays:0});else{ex.clockIn=now;ex.status='present';}renderAttendance();document.getElementById('clk-in-btn').style.opacity='.5';document.getElementById('clk-out-btn').style.opacity='1';toast(`Clocked IN at ${now} ✓`,'success');}else{if(!adminClockedIn){toast("Haven't clocked in yet!",'error');return;}adminClockedIn=false;const ex=ATTENDANCE.find(a=>a.emp==='Admin — Mentor');if(ex)ex.clockOut=now;renderAttendance();document.getElementById('clk-in-btn').style.opacity='1';document.getElementById('clk-out-btn').style.opacity='.5';toast(`Clocked OUT at ${now} ✓`,'success');}}
+
+/* ══ PAYROLL ══ */
+function renderPayroll(){
+  const tb=document.getElementById('payroll-body');if(!tb)return;
+  tb.innerHTML=EMPS.map(e=>{
+    const att=ATTENDANCE.find(a=>a.emp===empName(e));
+    const abs=att?att.absentDays:0;
+    const tx=calcNetPay(e.sal,abs);
+    return`<tr>
+      <td><div class="ec"><div class="av" style="background:${e.col}">${e.fn[0]}${e.ln[0]}</div><div><div class="en">${e.fn} ${e.ln}</div><div class="ee">${e.dept}</div></div></div></td>
+      <td>${e.dept}</td>
+      <td>UGX ${fmtSal(e.sal)}</td>
+      <td style="color:var(--danger);font-weight:600">-UGX ${fmtSal(tx.paye)}</td>
+      <td style="color:var(--danger)">-UGX ${fmtSal(tx.nssfEmp)}</td>
+      <td style="color:var(--success)">UGX ${fmtSal(tx.nssfEmpr)}</td>
+      <td style="color:var(--danger)">-UGX ${fmtSal(tx.lst)}</td>
+      <td style="color:${tx.absDed>0?'var(--danger)':'var(--sub)'}">-UGX ${fmtSal(tx.absDed)}</td>
+      <td style="font-weight:800;color:var(--navy)">UGX ${fmtSal(tx.net)}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="openPayslip('${empName(e)}','${e.pos}',${e.sal},${abs})">Payslip</button></td>
+    </tr>`;
+  }).join('');
+}
+function openPayslip(name,pos,sal,abs=0){
+  const tx=calcNetPay(sal,abs);
+  const wk=22,daysWorked=wk-abs;
+  document.getElementById('ps-name').textContent=name;
+  document.getElementById('ps-pos').textContent=pos;
+  document.getElementById('ps-period').textContent='April 2026';
+  document.getElementById('ps-basic').textContent='UGX '+fmtSal(sal);
+  document.getElementById('ps-days').textContent=daysWorked+' / '+wk+' days';
+  document.getElementById('ps-paye').textContent='-UGX '+fmtSal(tx.paye);
+  document.getElementById('ps-nssf-emp').textContent='-UGX '+fmtSal(tx.nssfEmp);
+  document.getElementById('ps-lst').textContent='-UGX '+fmtSal(tx.lst);
+  document.getElementById('ps-deduct').textContent=tx.absDed>0?'-UGX '+fmtSal(tx.absDed):'UGX 0';
+  document.getElementById('ps-nssf-empr').textContent='UGX '+fmtSal(tx.nssfEmpr);
+  document.getElementById('ps-net').textContent='UGX '+fmtSal(tx.net);
+  openModal('payslipModal');
+}
+function exportPayrollCSV(){
+  const rows=[['Employee','Position','Department','Basic Salary','PAYE','NSSF Employee','NSSF Employer','LST','Absence Deduction','Net Pay']];
+  EMPS.forEach(e=>{
+    const att=ATTENDANCE.find(a=>a.emp===empName(e));
+    const abs=att?att.absentDays:0;
+    const tx=calcNetPay(e.sal,abs);
+    rows.push([empName(e),e.pos,e.dept,e.sal,tx.paye,tx.nssfEmp,tx.nssfEmpr,tx.lst,tx.absDed,tx.net]);
+  });
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));a.download='mentor-payroll-april-2026.csv';a.click();toast('Payroll CSV exported!','success');
+}
+
+/* ══ PERFORMANCE ══ */
+function perfRating(avg){if(avg>=85)return{label:'Excellent',cls:'b-excellent'};if(avg>=70)return{label:'Good',cls:'b-good'};if(avg>=55)return{label:'Average',cls:'b-average'};return{label:'Poor',cls:'b-poor'};}
+function renderPerformance(){
+  const tb=document.getElementById('perf-body');if(!tb)return;
+  tb.innerHTML=PERFORMANCE.map((p,i)=>{
+    const avg=Math.round((p.kpi+p.att+p.team+p.init4)/4);
+    const r=perfRating(avg);
+    const scoreBar=(val,col)=>`<div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:5px;background:var(--surface);border-radius:3px;overflow:hidden"><div style="width:${val}%;height:100%;background:${col};border-radius:3px"></div></div><span style="font-size:11px;font-weight:700;min-width:28px">${val}%</span></div>`;
+    return`<tr>
+      <td><div class="ec"><div class="av" style="background:${p.col}">${p.init}</div><div><div class="en">${p.emp}</div><div class="ee">${p.dept}</div></div></div></td>
+      <td>${p.dept}</td><td>${p.period}</td>
+      <td>${scoreBar(p.kpi,'#2563EB')}</td>
+      <td>${scoreBar(p.att,'#059669')}</td>
+      <td>${scoreBar(p.team,'#7C3AED')}</td>
+      <td><strong>${avg}%</strong></td>
+      <td><span class="badge ${r.cls}">${r.label}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="viewPerfDetail(${i})">Detail</button></td>
+    </tr>`;
+  }).join('');
+}
+function submitPerf(){
+  const emp=document.getElementById('pf-emp').value;
+  const period=document.getElementById('pf-period').value;
+  const kpi=parseInt(document.getElementById('pf-kpi1').value)||0;
+  const att=parseInt(document.getElementById('pf-kpi2').value)||0;
+  const team=parseInt(document.getElementById('pf-kpi3').value)||0;
+  const init4=parseInt(document.getElementById('pf-kpi4').value)||0;
+  const notes=document.getElementById('pf-notes').value;
+  const empData=EMPS.find(e=>empName(e)===emp)||{col:'#1B3272'};
+  const init=emp.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const dept=empData.dept||'—';
+  PERFORMANCE.push({emp,col:empData.col,init,dept,period,kpi,att,team,init4,notes});
+  renderPerformance();updateStats();closeModal('perfModal');
+  ['pf-kpi1','pf-kpi2','pf-kpi3','pf-kpi4','pf-notes'].forEach(id=>document.getElementById(id).value='');
+  toast(`Review saved for ${emp}!`,'success');
+}
+function viewPerfDetail(i){const p=PERFORMANCE[i];toast(`${p.emp}: KPI ${p.kpi}% · Att ${p.att}% · Team ${p.team}% · Initiative ${p.init4}%`,'success');}
+
+/* ══ RECRUITMENT ══ */
+function renderJobs(){
+  const tb=document.getElementById('jobs-body');if(!tb)return;
+  tb.innerHTML=JOBS.map((j,i)=>`<tr>
+    <td><div class="en">${j.title}</div><div class="ee">${j.desc}</div></td>
+    <td>${j.dept}</td><td>${j.posted}</td>
+    <td><strong>${APPLICANTS.filter(a=>a.job===j.title).length}</strong></td>
+    <td>${j.deadline}</td>
+    <td><span class="badge b-open">Open</span></td>
+    <td><div style="display:flex;gap:5px"><button class="btn btn-success btn-sm" onclick="toast('Job closed!','success')">Close</button><button class="btn btn-danger btn-sm" onclick="JOBS.splice(${i},1);renderJobs();updateStats();toast('Job removed','error')">Remove</button></div></td>
+  </tr>`).join('');
+}
+function renderApplicants(){
+  const tb=document.getElementById('applicants-body');if(!tb)return;
+  const statusMap2={pending:'b-pending',shortlisted:'b-shortlisted',interview:'b-interview',hired:'b-hired',rejected:'b-rejected'};
+  tb.innerHTML=APPLICANTS.map((a,i)=>`<tr>
+    <td><div class="ec"><div class="av" style="background:${a.col}">${a.fn[0]}${a.ln[0]}</div><div><div class="en">${a.fn} ${a.ln}</div><div class="ee">${a.em}</div></div></div></td>
+    <td>${a.job}</td>
+    <td>Apr 1, 2026</td>
+    <td>${a.exp} yr${a.exp!==1?'s':''}</td>
+    <td><span class="badge ${statusMap2[a.status]||'b-pending'}">${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span></td>
+    <td><div style="display:flex;gap:5px">
+      <select class="fi" style="font-size:11px;padding:4px 8px" onchange="updateApplicantStatus(${i},this.value)"><option value="">Move to…</option><option value="shortlisted">Shortlist</option><option value="interview">Interview</option><option value="hired">Hire</option><option value="rejected">Reject</option></select>
+    </div></td>
+  </tr>`).join('');
+}
+function updateApplicantStatus(i,val){if(!val)return;APPLICANTS[i].status=val;renderApplicants();updateStats();toast(`${APPLICANTS[i].fn} ${APPLICANTS[i].ln} moved to ${val}`,'success');}
+function postJob(){
+  const title=document.getElementById('job-title').value.trim();
+  if(!title){toast('Job title required','error');return;}
+  const dept=document.getElementById('job-dept').value;
+  const deadline=document.getElementById('job-deadline').value;
+  const desc=document.getElementById('job-desc').value;
+  const now=new Date().toLocaleDateString('en-UG',{month:'short',day:'numeric',year:'numeric'});
+  JOBS.push({id:Date.now(),title,dept,posted:now,deadline:deadline||'TBD',status:'open',desc:desc||'—'});
+  renderJobs();updateStats();populateJobSelects();closeModal('jobModal');
+  ['job-title','job-desc','job-deadline'].forEach(id=>document.getElementById(id).value='');
+  toast(`"${title}" posted!`,'success');
+}
+function addApplicant(){
+  const fn=document.getElementById('ap-fn').value.trim(),ln=document.getElementById('ap-ln').value.trim();
+  if(!fn||!ln){toast('Name required','error');return;}
+  const cols=['#1B3272','#F59E0B','#059669','#7C3AED','#DC2626','#0891B2'];
+  APPLICANTS.push({fn,ln,ph:document.getElementById('ap-ph').value||'—',em:document.getElementById('ap-em').value||'—',job:document.getElementById('ap-job').value,exp:parseInt(document.getElementById('ap-exp').value)||0,status:'pending',col:cols[Math.floor(Math.random()*cols.length)]});
+  renderApplicants();updateStats();closeModal('applicantModal');
+  ['ap-fn','ap-ln','ap-ph','ap-em','ap-exp'].forEach(id=>document.getElementById(id).value='');
+  toast(`${fn} ${ln} added!`,'success');
+}
+function renderDashboardJobs(){
+  const c=document.getElementById('dash-jobs');if(!c)return;
+  const open=JOBS.filter(j=>j.status==='open');
+  if(!open.length){c.innerHTML='<div style="text-align:center;padding:22px 0;color:var(--sub);font-size:13px">No open positions</div>';return;}
+  c.innerHTML=open.map(j=>`<div class="li"><div style="width:38px;height:38px;border-radius:9px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="li-info"><div class="li-name">${j.title}</div><div class="li-meta">${j.dept} · ${APPLICANTS.filter(a=>a.job===j.title).length} applicants · Deadline ${j.deadline}</div></div><span class="badge b-open">Open</span></div>`).join('');
+}
+function renderDashboardDisc(){
+  const c=document.getElementById('dash-disc');if(!c)return;
+  const open=DISCIPLINARY.filter(d=>d.status==='open');
+  if(!open.length){c.innerHTML='<div style="text-align:center;padding:22px 0;color:var(--sub);font-size:13px">✅ No open cases</div>';return;}
+  c.innerHTML=open.map(d=>`<div class="li"><div class="av" style="background:${d.col}">${d.init}</div><div class="li-info"><div class="li-name">${d.emp}</div><div class="li-meta">${d.offence} · Hearing: ${d.hearing}</div></div><span class="badge b-pending">Open</span></div>`).join('');
+}
+
+/* ══ DISCIPLINARY ══ */
+function renderDisc(){
+  const tb=document.getElementById('disc-body');if(!tb)return;
+  const statusCls={open:'b-pending',resolved:'b-approved',dismissed:'b-rejected'};
+  tb.innerHTML=DISCIPLINARY.map((d,i)=>`<tr>
+    <td style="font-family:monospace;font-size:12px;color:var(--sub)">${d.id}</td>
+    <td><div class="ec"><div class="av" style="background:${d.col}">${d.init}</div><div class="en">${d.emp}</div></div></td>
+    <td>${d.offence}</td><td>${d.date}</td><td>${d.hearing}</td>
+    <td>${d.outcome}</td>
+    <td><span class="badge ${statusCls[d.status]||'b-pending'}">${d.status.charAt(0).toUpperCase()+d.status.slice(1)}</span></td>
+    <td><div style="display:flex;gap:5px">
+      ${d.status==='open'?`<button class="btn btn-success btn-sm" onclick="resolveCase(${i},'resolved','Written Warning')">Resolve</button><button class="btn btn-danger btn-sm" onclick="resolveCase(${i},'dismissed','Dismissed')">Dismiss</button>`:`<span style="font-size:12px;color:var(--sub)">Closed</span>`}
+    </div></td>
+  </tr>`).join('');
+}
+function logCase(){
+  const emp=document.getElementById('dc-emp').value;
+  const date=document.getElementById('dc-date').value;
+  const offence=document.getElementById('dc-offence').value.trim();
+  if(!offence||!date){toast('Offence and date required','error');return;}
+  const hearing=document.getElementById('dc-hearing').value;
+  const notes=document.getElementById('dc-notes').value;
+  const severity=document.getElementById('dc-severity').value;
+  const empData=EMPS.find(e=>empName(e)===emp)||{col:'#DC2626'};
+  const init=emp.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const ref='DC-'+String(DISCIPLINARY.length+1).padStart(3,'0');
+  const fmtDate=d=>d?new Date(d).toLocaleDateString('en-UG',{month:'short',day:'numeric',year:'numeric'}):'-';
+  DISCIPLINARY.push({id:ref,emp,col:empData.col,init,offence,date:fmtDate(date),hearing:hearing?fmtDate(hearing):'TBD',outcome:`${severity} — Pending`,status:'open'});
+  renderDisc();renderDashboardDisc();updateStats();closeModal('discModal');
+  ['dc-date','dc-offence','dc-notes','dc-hearing'].forEach(id=>document.getElementById(id).value='');
+  toast(`Case ${ref} logged for ${emp}`,'error');
+}
+function resolveCase(i,status,outcome){DISCIPLINARY[i].status=status;DISCIPLINARY[i].outcome=outcome;renderDisc();renderDashboardDisc();updateStats();toast(status==='dismissed'?`${DISCIPLINARY[i].emp} dismissed`:`Case resolved`,'success');}
+
+/* ══ DOCUMENTS ══ */
+function docTypeIcon(type){const m={Contract:'doc-ico-doc',ID:'doc-ico-img',Certificate:'doc-ico-doc',Appraisal:'doc-ico-pdf',Policy:'doc-ico-pdf',Other:'doc-ico-other'};return m[type]||'doc-ico-other';}
+function docSvg(type){
+  if(type==='ID'||type==='Certificate')return`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`;
+  return`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+}
+function renderDocs(data){
+  const c=document.getElementById('doc-list');if(!c)return;
+  if(!data||!data.length){c.innerHTML='<div style="text-align:center;padding:32px 0;color:var(--sub);font-size:13px">No documents found</div>';return;}
+  c.innerHTML=data.map((d,i)=>`<div class="doc-item">
+    <div class="doc-ico ${docTypeIcon(d.type)}">${docSvg(d.type)}</div>
+    <div class="doc-info"><div class="doc-name">${d.name}</div><div class="doc-meta">${d.emp} · ${d.type}${d.expiry?' · Expires: '+d.expiry:''}</div></div>
+    <div class="doc-act">
+      <button class="btn btn-outline btn-sm" onclick="toast('Downloading ${d.file}…','success')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+      <button class="btn btn-danger btn-sm" onclick="DOCUMENTS.splice(${DOCUMENTS.indexOf(d)},1);filterDocsByEmp();updateStats();toast('Document removed','error')">✕</button>
+    </div>
+  </div>`).join('');
+}
+function filterDocs(v){const emp=document.getElementById('doc-emp-filter').value;const type=document.getElementById('doc-type-filter').value;renderDocs(DOCUMENTS.filter(d=>d.name.toLowerCase().includes(v.toLowerCase())&&(emp==='All Employees'||d.emp===emp)&&(type==='All Types'||d.type===type)));}
+function filterDocsByEmp(){filterDocs(document.querySelector('#sec-documents .search-box input')?.value||'');}
+function uploadDoc(){
+  const emp=document.getElementById('doc-emp').value;
+  const type=document.getElementById('doc-type').value;
+  const name=document.getElementById('doc-name').value.trim();
+  if(!name){toast('Document name required','error');return;}
+  const file=document.getElementById('doc-file').value||name.replace(/\s/g,'_').toLowerCase()+'.pdf';
+  const expiry=document.getElementById('doc-expiry').value;
+  const fmtDate=d=>d?new Date(d).toLocaleDateString('en-UG',{month:'short',day:'numeric',year:'numeric'}):null;
+  const empData=EMPS.find(e=>empName(e)===emp)||{col:'#1B3272'};
+  DOCUMENTS.push({id:Date.now(),emp,type,name,file,expiry:fmtDate(expiry),col:empData.col});
+  filterDocsByEmp();updateStats();closeModal('docModal');
+  ['doc-name','doc-file','doc-expiry'].forEach(id=>document.getElementById(id).value='');
+  toast(`"${name}" uploaded!`,'success');
+}
+
+/* ══ SHIFTS ══ */
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function renderRoster(){
+  const el=document.getElementById('roster-table');if(!el)return;
+  let html=`<div class="shift-grid">`;
+  DAYS.forEach(d=>html+=`<div class="shift-day-hd">${d.slice(0,3)}</div>`);
+  // group by employee rows — simplified: show all employees as rows
+  EMPS.forEach(e=>{
+    const name=empName(e);
+    DAYS.forEach(day=>{
+      const shift=SHIFTS.find(s=>s.emp===name&&s.day===day);
+      if(shift){
+        html+=`<div class="shift-cell has-shift"><div style="font-size:9px;color:var(--sub);font-weight:600">${name.split(' ')[0]}</div><span class="shift-pill ${shift.type}">${shift.type.charAt(0).toUpperCase()+shift.type.slice(1)}</span></div>`;
+      }else{
+        html+=`<div class="shift-cell" onclick="prefillShift('${name}','${day}')"></div>`;
+      }
+    });
+  });
+  html+='</div>';
+  // legend
+  html+=`<div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+    <span class="legend-dot"><span style="background:#2563EB;border-radius:3px"></span>Morning 8am–2pm</span>
+    <span class="legend-dot"><span style="background:#7C3AED;border-radius:3px"></span>Afternoon 2pm–8pm</span>
+    <span class="legend-dot"><span style="background:#1E293B;border-radius:3px"></span>Night 8pm–6am</span>
+  </div>`;
+  el.innerHTML=html;
+}
+function prefillShift(emp,day){document.getElementById('sh-emp').value=emp;document.getElementById('sh-day').value=day;openModal('shiftModal');}
+function assignShift(){
+  const emp=document.getElementById('sh-emp').value;
+  const day=document.getElementById('sh-day').value;
+  const type=document.getElementById('sh-type').value;
+  const empData=EMPS.find(e=>empName(e)===emp)||{col:'#1B3272'};
+  const existing=SHIFTS.findIndex(s=>s.emp===emp&&s.day===day);
+  if(existing>=0)SHIFTS.splice(existing,1);
+  SHIFTS.push({emp,col:empData.col,day,type});
+  renderRoster();updateStats();closeModal('shiftModal');
+  toast(`${emp.split(' ')[0]}'s ${type} shift on ${day} assigned!`,'success');
+}
+
+/* ══ NAV ══ */
+function nav(page,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(`sec-${page}`).classList.add('active');
+  document.getElementById('pg-title').textContent=PAGES[page].title;
+  document.getElementById('pg-sub').textContent=PAGES[page].sub;
+  document.getElementById('top-lbl').textContent=PAGES[page].btn;
+  if(window.innerWidth<=768)closeSidebar();
+}
+function topAction(){
+  const id=document.querySelector('.section.active').id;
+  if(['sec-dashboard','sec-employees'].includes(id))openModal('empModal');
+  else if(id==='sec-leave')openModal('leaveModal');
+  else if(id==='sec-payroll')exportPayrollCSV();
+  else if(id==='sec-performance')openModal('perfModal');
+  else if(id==='sec-recruitment')openModal('jobModal');
+  else if(id==='sec-disciplinary')openModal('discModal');
+  else if(id==='sec-documents')openModal('docModal');
+  else if(id==='sec-shifts')openModal('shiftModal');
+  else if(id==='sec-attendance')toast('Attendance refreshed!','success');
+  else toast('Settings saved!','success');
+}
+
+/* ══ MOBILE SIDEBAR ══ */
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('backdrop').classList.add('open');document.body.style.overflow='hidden';}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('backdrop').classList.remove('open');document.body.style.overflow='';}
+
+/* ══ MODALS ══ */
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));});
+
+/* ══ CLOCK ══ */
+function tickClock(){const el=document.getElementById('live-clk');if(el)el.textContent=new Date().toLocaleTimeString('en-UG',{hour12:false});}
+setInterval(tickClock,1000);tickClock();
+
+/* ══ DATES ══ */
+const _now=new Date(),_long=_now.toLocaleDateString('en-UG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),_short=_now.toLocaleDateString('en-UG',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+const p=document.getElementById('today-pill');if(p)p.textContent=_short;
+const s=document.getElementById('today-snap');if(s)s.textContent=_long;
+const d=document.getElementById('today-date-att');if(d)d.textContent=_long;
+
+/* ══ TOAST ══ */
+let _tt;function toast(msg,type='success'){const t=document.getElementById('toast-box');const ic=type==='success'?'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';t.innerHTML=ic+msg;t.className=`toast show ${type}`;clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3200);}
+
+/* ══ INIT ══ */
+populateEmpSelects();
+populateJobSelects();
+renderEmps(EMPS);
+renderLeaves();
+renderDashboardLeaves();
+renderDashboardJobs();
+renderDashboardDisc();
+renderAttendance();
+renderPayroll();
+renderPerformance();
+renderJobs();
+renderApplicants();
+renderDisc();
+renderDocs(DOCUMENTS);
+renderRoster();
+updateStats();
+</script>
+</body>
+</html>
